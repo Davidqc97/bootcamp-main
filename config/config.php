@@ -1,10 +1,10 @@
 <?php
 // === Configuración de entorno (InfinityFree) ===
-define('DB_HOST', 'sql303.infinityfree.com');
-define('DB_PORT', '3306'); // no lo usa mysqli directamente, pero lo dejamos anotado
-define('DB_NAME', 'if0_40011650_training_plans');
-define('DB_USER', 'if0_40011650');
-define('DB_PASS', 'CU2GIZ9tqlRFC');
+define('DB_HOST', '');
+define('DB_PORT', '');
+define('DB_NAME', '');
+define('DB_USER', '');
+define('DB_PASS', '');
 
 // Ajustes de la app
 define('APP_NAME', 'Mi Proyecto - Login');

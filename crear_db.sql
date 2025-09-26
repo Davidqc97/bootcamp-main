@@ -1,17 +1,14 @@
 --
--- Base de datos: `formulario_db`
 --
 
 -- 1. CREAR LA BASE DE DATOS (si no existe)
-CREATE DATABASE IF NOT EXISTS `formulario_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE `formulario_db`;
 
 -- --------------------------------------------------------
 
 --
 -- ESTRUCTURA PARA LA TABLA `usuarios` (Tabla Principal)
 --
-CREATE TABLE `usuarios` (
+CREATE TABLE IF NOT EXISTS `usuarios` (
   `user_idx` int(11) NOT NULL AUTO_INCREMENT,
   `sexo` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
   `idioma` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -32,19 +29,19 @@ CREATE TABLE `usuarios` (
 -- ESTRUCTURAS PARA LAS TABLAS DE CATÁLOGO (Opciones para `mh_*`)
 --
 
-CREATE TABLE `catalogo_equipos` (
+CREATE TABLE IF NOT EXISTS `catalogo_equipos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `catalogo_lesiones` (
+CREATE TABLE IF NOT EXISTS `catalogo_lesiones` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `catalogo_objetivos` (
+CREATE TABLE IF NOT EXISTS `catalogo_objetivos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
@@ -78,21 +75,21 @@ INSERT INTO `catalogo_objetivos` (`id`, `nombre`) VALUES
 -- ESTRUCTURAS PARA LAS TABLAS PIVOTE (Relaciones `mh_*`)
 --
 
-CREATE TABLE `usuario_equipos` (
+CREATE TABLE IF NOT EXISTS `usuario_equipos` (
   `id_usuario` int(11) NOT NULL,
   `id_equipo` int(11) NOT NULL,
   PRIMARY KEY (`id_usuario`,`id_equipo`),
   KEY `id_equipo` (`id_equipo`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `usuario_lesiones` (
+CREATE TABLE IF NOT EXISTS `usuario_lesiones` (
   `id_usuario` int(11) NOT NULL,
   `id_lesion` int(11) NOT NULL,
   PRIMARY KEY (`id_usuario`,`id_lesion`),
   KEY `id_lesion` (`id_lesion`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `usuario_objetivos` (
+CREATE TABLE IF NOT EXISTS `usuario_objetivos` (
   `id_usuario` int(11) NOT NULL,
   `id_objetivo` int(11) NOT NULL,
   PRIMARY KEY (`id_usuario`,`id_objetivo`),

@@ -1,6 +1,11 @@
 <?php
 // Archivo: listar.php (Reescrito para DB Normalizada)
-require 'conexion.php';
+
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../lib/auth.php';
+require_auth();
+$db = db(); // PDO
+$user = auth_user();
 
 // Consulta con JOINs y GROUP_CONCAT para obtener toda la información
 $sql = "
@@ -29,8 +34,8 @@ $sql = "
         u.fecha_registro DESC;
 ";
 
-$resultado = $conexion->query($sql);
-
+$resultado_stmt = $db->query($sql);
+$filas = $resultado_stmt ? $resultado_stmt->fetchAll(PDO::FETCH_ASSOC) : [];
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -45,7 +50,7 @@ $resultado = $conexion->query($sql);
     <div class="container-fluid mt-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3>Usuarios Registrados (Estructura Correcta)</h3>
-            <a href="index.php" class="btn btn-primary">Volver al Inicio</a>
+            <a href="dashboard.php" class="btn btn-primary">Volver al Inicio</a>
         </div>
         <div class="card">
             <div class="card-body">
@@ -58,8 +63,8 @@ $resultado = $conexion->query($sql);
                         </thead>
                         <tbody>
                             <?php
-                            if ($resultado && $resultado->num_rows > 0) {
-                                while($fila = $resultado->fetch_assoc()) {
+                            if (!empty($filas)) {
+                                foreach ($filas as $fila) {
                                     echo "<tr>";
                                     echo "<td>" . htmlspecialchars($fila["user_idx"]) . "</td>";
                                     echo "<td>" . htmlspecialchars($fila["sexo"]) . "</td>";
@@ -84,7 +89,7 @@ $resultado = $conexion->query($sql);
             </div>
         </div>
     </div>
-<?php $conexion->close(); ?>
+<?php $resultado_stmt = null; $db = null; ?>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

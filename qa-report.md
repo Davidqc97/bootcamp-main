@@ -5,7 +5,8 @@
 ### 1. Validación de formularios
 - Caso: Campo email vacío  
 - Resultado esperado: mensaje de error, debe completar este campo. 
-- Resultado obtenido: ![Descripción](./images/11image.PNG)
+- Resultado obtenido:
+ ![Descripción](./images/11image.PNG)
 
 ---
 

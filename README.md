@@ -2,13 +2,13 @@
 ### Grupo 5
 
 ## 👥 Integrantes y Roles
-- [] – Líder / Coordinador
-- [] – Desarrollador Backend
-- [] – Desarrollador Frontend / UI
-- [] – Administrador de Base de Datos (DBA)
-- [] – DevOps / Deployment
-- [] – QA / Tester
-- [] – Documentador / Presentador
+- [Alejandro Franco Cedaño] – Líder / Coordinador
+- [Maria Alejandra Caicedo] – Desarrollador Backend
+- [Jose David Escalante] – Desarrollador Frontend / UI
+- [Jose David Escalante] – Administrador de Base de Datos (DBA)
+- [David Quiceno] – DevOps / Deployment
+- [Sebastian Cordoba] – QA / Tester
+- [Daniela Torres Gallego] – Documentador / Presentador
 
 ---
 
@@ -146,12 +146,12 @@ La tabla **`usuarios`** centraliza el perfil que utilizará la lógica de recome
 ---
 
 ## 📝 Changelog (registro de cambios)
-- [Nombre] — Implementó validaciones y **prepared statements**.  
-- [Nombre] — Mejoró la interfaz y organizó assets (`static/`).  
-- [Nombre] — Configuró la BD y generó `dump.sql`.  
-- [Nombre] — Publicó en InfinityFree.  
-- [Nombre] — Realizó QA y documentó resultados.  
-- [Nombre] — Redactó README y preparó presentación.
+- [David Quiceno] — Implementó validaciones y **prepared statements**.  
+- [Maria Alejandra Caicedo] — Mejoró la interfaz y organizó assets (`static/`).  
+- [Jose David Escalante - Maria Alejandra Caicedo] — Configuró la BD y generó `dump.sql`.  
+- [Jose David Escalante] — Publicó en InfinityFree.  
+- [Sebastian Cordoba] — Realizó QA y documentó resultados.  
+- [Daniela Torres] — Redactó README y preparó presentación.
 
 > Sugerencia: Llevar un `CHANGELOG.md` con versiones y fechas.
 
@@ -159,18 +159,25 @@ La tabla **`usuarios`** centraliza el perfil que utilizará la lógica de recome
 
 ## ☁️ Preguntas de Reflexión (Cloud)
 1. **¿Qué es despliegue y cómo lo hicieron?**  
-    > 
+   - disponibilizar un servicio
 
 2. **¿Qué limitaciones encontraron en InfinityFree?**  
-   > 
+   - Todo es manual (subir archivos, carpetas, bases de datos). 
+   - Espera para la disponibilidad y adsequibilidad de los servicios. 
+   - Menor seguridad
+   - Servicio intermitente
+   - Solo se permite PhP y HTML en la capa gratuita
+   - Solo permite MySQL como base de datos
+   - No se puede gestionar variables de entorno
 
 3. **Servicios equivalentes en AWS/Azure/GCP**  
-   - **Archivos estáticos**:
-   - **Base de datos**: 
-   - **Hosting del sitio**: 
+   - **Archivos estáticos**: S3 / Blob Storage / Cloud Storage
+   - **Base de datos**: RDS / Azure Database for MySQL / Cloud SQL
+   - **Hosting del sitio**: CloudFront / Azure CDN / Cloud CDN
 
-4. **Escalabilidad y alta disponibilidad**  
-   > 
+4. **Escalabilidad y alta disponibilidad en la nube**  
+   - capacidad de aumentar recursos según demanda.
+   - capacidad de que los servicios permanezcan activos ante cualquier eventualidad.
 
 5. **Plan de migración (4–5 pasos)**  
    1) Mover estáticos a **S3/Blob/GCS** + **CDN**.  

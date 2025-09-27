@@ -38,7 +38,9 @@
 - Resultado esperado: se guarda en la BD y aparece en `listar.php`  
 - Resultado obtenido: 
 
- ![Descripción](./images/11image.PNG)
+ ![Descripción](./images/31image.PNG)
+
+ ![Descripción](./images/32image.PNG)
 
 - Caso: Exportar CSV  
 - Resultado esperado: descarga archivo con registros  

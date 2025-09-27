@@ -15,7 +15,13 @@
 - Resultado esperado: no se guarda en BD, verifica que las credenciales son invalidas 
 - Resultado obtenido: 
 
- ![Descripción](./images/11image.PNG)
+Al iniciar sesión con credenciales incorrectas
+
+ ![Descripción](./images/121image.PNG)
+
+ Se generá el siguiente mensaje de alerta indicando que las credenciales son invalidas. 
+
+  ![Descripción](./images/122image.PNG)
 
 ---
 
@@ -33,6 +39,8 @@
 
  ![Descripción](./images/22image.jpeg)
 
+---
+
 ### 3. Funcionalidad
 - Caso: Insertar registro válido  
 - Resultado esperado: se guarda en la BD y aparece en `listar.php`  
@@ -48,6 +56,8 @@
 
  ![Descripción](./images/11image.PNG)
 
+---
+
 ### 4. Login (si aplica)
 - Caso: Usuario/contraseña correcta  
 - Resultado esperado: acceso permitido  
@@ -62,6 +72,8 @@
 - Resultado obtenido: 
 
  ![Descripción](./images/11image.PNG)
+
+---
 
 ## ✅ Conclusiones QA
 - [Breve conclusión del tester: ¿funciona correctamente? ¿qué falta por corregir?]

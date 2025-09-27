@@ -31,7 +31,7 @@
 - Resultado esperado: hash en vez de texto plano  
 - Resultado obtenido: 
 
- ![Descripción](./images/22image.PNG)
+ ![Descripción](./images/22image.jpeg)
 
 ### 3. Funcionalidad
 - Caso: Insertar registro válido  

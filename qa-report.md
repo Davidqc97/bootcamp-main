@@ -13,6 +13,9 @@
 - Caso: Email inválido (ej: "abc123")  
 - Resultado esperado: no se guarda en BD  
 - Resultado obtenido: [Anotar aquí]
+ ![Descripción](./images/11image.PNG)
+
+---
 
 ### 2. Seguridad
 - Caso: Intento de inyección SQL (`' OR 1=1 --`)  

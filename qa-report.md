@@ -53,7 +53,9 @@
 - Resultado esperado: acceso permitido  
 - Resultado obtenido: 
 
- ![Descripción](./images/11image.PNG)
+ ![Descripción](./images/31image.PNG)
+
+  ![Descripción](./images/33image.PNG)
 
 - Caso: Usuario/contraseña incorrecta  
 - Resultado esperado: acceso denegado  
@@ -63,3 +65,12 @@
 
 ## ✅ Conclusiones QA
 - [Breve conclusión del tester: ¿funciona correctamente? ¿qué falta por corregir?]
+
+La aplicación presenta un comportamiento seguro y funcional en las pruebas realizadas:
+- ✅ Validaciones de formulario funcionan correctamente
+- ✅ Sistema resistente a inyecciones SQL básicas  
+- ✅ Autenticación funciona según lo esperado
+
+
+**Estado general**: ACEPTABLE para producción POC con funcionalidades básicas. 
+**Recomendaciones**: Realizar pruebas adicionales con mayor volumen de datos.

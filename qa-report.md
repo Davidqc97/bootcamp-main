@@ -5,7 +5,8 @@
 ### 1. Validación de formularios
 - Caso: Campo email vacío  
 - Resultado esperado: mensaje de error  
-- Resultado obtenido: [Anotar aquí]
+- Resultado obtenido: ![Descripción](./images/mi_imagen.png)
+
 
 - Caso: Email inválido (ej: "abc123")  
 - Resultado esperado: no se guarda en BD  

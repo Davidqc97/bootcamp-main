@@ -12,7 +12,8 @@
 
 - Caso: Email inválido (ej: "abc123")  
 - Resultado esperado: no se guarda en BD, verifica que las credenciales son invalidas 
-- Resultado obtenido: [Anotar aquí]
+- Resultado obtenido: 
+
  ![Descripción](./images/11image.PNG)
 
 ---

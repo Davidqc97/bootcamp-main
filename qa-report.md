@@ -73,7 +73,9 @@ Se generá el siguiente mensaje de alerta indicando que las credenciales son inv
 - Resultado obtenido: 
 - **Pasos para reproducir:**  
   1. Iniciar Sesion 
-  2. Seleccionar la opción registrar nuevo usuario  
+  2. Seleccionar la opción "registrar nuevo usuario".  
+  2. Diligenciar todos los campos del formulario de registro. 
+  4. Seleccionar la opción "ver usuarios registrados".
 
  ![Descripción](./images/31image.PNG)
 
@@ -107,8 +109,10 @@ Se generá el siguiente mensaje de alerta indicando que las credenciales son inv
 - Caso: Usuario/contraseña incorrecta  
 - Resultado esperado: acceso denegado  
 - Resultado obtenido: 
+- **Pasos para reproducir:**  
+  1. Iniciar Sesion con las credenciales incorrectas.
 
- ![Descripción](./images/11image.PNG)
+ ![Descripción](./images/1222image.PNG)
 
 ---
 

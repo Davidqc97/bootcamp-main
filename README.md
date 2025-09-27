@@ -2,20 +2,20 @@
 ### Grupo 5
 
 ## 👥 Integrantes y Roles
-- [Nombre completo] – Líder / Coordinador
-- [Nombre completo] – Desarrollador Backend
-- [Nombre completo] – Desarrollador Frontend / UI
-- [Nombre completo] – Administrador de Base de Datos (DBA)
-- [Nombre completo] – DevOps / Deployment
-- [Nombre completo] – QA / Tester
-- [Nombre completo] – Documentador / Presentador
+- [] – Líder / Coordinador
+- [] – Desarrollador Backend
+- [] – Desarrollador Frontend / UI
+- [] – Administrador de Base de Datos (DBA)
+- [] – DevOps / Deployment
+- [] – QA / Tester
+- [] – Documentador / Presentador
 
 ---
 
 ## 📖 Descripción del Proyecto
 **Plataforma de Evaluación y Rutinas Personalizadas.**  
 Aplicación web que **recopila datos del usuario** (sexo, idioma, nivel, edad, altura, peso, disponibilidad, etc.) para **generar una rutina de entrenamiento personalizada**, con **login** y autorización por roles (**admin** / **usuario**).  
-Stack: **PHP 8.x + MySQL** y despliegue en **InfinityFree**.
+Stack: **PHP x.x + MySQL** y despliegue en **InfinityFree**.
 
 ---
 
@@ -28,30 +28,47 @@ Stack: **PHP 8.x + MySQL** y despliegue en **InfinityFree**.
    - Base de datos: `[db asignada]`
 3. **Importar BD** con **phpMyAdmin** usando `crear_db.sql` (o `dump.sql` si ya tienen datos).
 4. **Ingresar** al sitio desde la URL pública:  
-   **[]**
+   **[https://cloudcomputingbootcamp.free.nf/index.php]**
 
 ---
 
 ## 🧭 Navegación principal (rutas)
-- `GET /index.php` → Home / acceso.  
-- `GET /formulario.php` → Formulario de perfil del usuario.  
-- `POST /procesar.php` → Guardado/actualización del perfil en BD (prepared statements).  
-- `GET /listar.php` → Listado de perfiles (**solo rol `admin`**).  
+- `GET /index.php` → Home (puede redirigir a `public/login.php` si no hay sesión).  
+- `GET /public/login.php` → Inicio de sesión.  
+- `GET /public/logout.php` → Cierre de sesión.  
+- `GET /protected/dashboard.php` → Panel (requiere sesión).  
+- `GET /protected/formulario.php` → Formulario de perfil del usuario.  
+- `POST /protected/procesar.php` → Guardado/actualización en BD (**prepared statements**).  
+- `GET /protected/listar.php` → Listado de perfiles (**solo rol `admin`**).  
 
 ---
 
 ## 🗂️ Estructura del Proyecto
 
 /
-├─ crear_db.sql              
-├─ Headers_Dataset-Personas.NUM.v2.csv 
-├─ conexion.php                
-├─ index.php                   
-├─ formulario.php              
-├─ procesar.php                
-├─ listar.php                  
-├─ setup.php                   
-└─  dump.sql
+├─ config/
+│  ├─ config.php
+│  └─ db.php
+├─ lib/
+│  ├─ auth.php
+│  ├─ csrf.php
+│  └─ session.php
+├─ protected/
+│  ├─ dashboard.php
+│  ├─ formulario.php
+│  ├─ listar.php
+│  └─ procesar.php
+├─ public/
+│  ├─ login.php
+│  └─ logout.php
+├─ sql/
+│  └─ 01_create_users.sql
+├─ Headers_Dataset-Personas.NUM.v2.csv
+├─ README.md
+├─ crear_db.sql
+├─ index.php
+├─ qa-report.md
+└─ setup.php
 
 ---
 
@@ -102,17 +119,18 @@ La tabla **`usuarios`** centraliza el perfil que utilizará la lógica de recome
 ---
 
 ## 🔐 Seguridad (mínimos recomendados)
-- **Sesiones**: `session_start()` + `session_regenerate_id(true)` tras login.
-- **Contraseñas**: `password_hash()` / `password_verify()` si gestionan usuarios propios.
-- **SQL**: **prepared statements** en TODAS las consultas.
-- **XSS/CSRF**: escapar salidas (`htmlspecialchars`) + token CSRF en formularios críticos.
-- **CSV injection**: prefijar `'` cuando un campo empiece por `= + - @`.
-- **Producción**: `display_errors=Off`, logs habilitados; **no** versionar credenciales ni `dump.sql`.
+- **Sesiones**: `session_start()` al inicio y `session_regenerate_id(true)` tras login.  
+- **Contraseñas**: `password_hash()` / `password_verify()`.  
+- **SQL**: **prepared statements** en TODAS las consultas.  
+- **XSS**: escapar salidas con `htmlspecialchars`.  
+- **CSRF**: token por formulario crítico y verificación en `procesar.php`.  
+- **CSV Injection**: prefijar `'` si un valor empieza por `=`, `+`, `-`, `@`.  
+- **Producción**: `display_errors=Off`, logging activado; **no** versionar credenciales ni dumps.  
 
 ---
 
 ## 🧪 Evidencias de Despliegue
-- URL del sitio: **[enlace]**  
+- URL del sitio: **[https://cloudcomputingbootcamp.free.nf/index.php]**  
 - Captura de **phpMyAdmin** con ≥3 registros → `capturas/phpmyadmin.png`  
 - Captura de **File Manager** con archivos subidos → `capturas/filemanager.png`  
 - Captura del **sitio funcionando** → `capturas/sitio.png`

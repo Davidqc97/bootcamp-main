@@ -1,45 +1,254 @@
+/* ===============================
+   🎨 Tokens (variables)
+==================================*/
+:root{
+  --bg: #0f0f10;
+  --surface: #1c1c1f;
+  --surface-2: #18181b;
+  --text: #e4e4e7;
+  --muted: #9ca3af;
+  --border: #3f3f46;
+  --accent: #a78bfa;
+  --btn: #6366f1;
+  --btn-hover: #4f46e5;
+
+  --amber: #f59e0b;
+  --amber-2: #fbbf24;
+  --blue-300: #60a5fa;
+  --blue-200: #93c5fd;
+  --green: #22c55e;
+  --green-2: #16a34a;
+
+  --radius: 12px;
+  --space: 25px;
+  --shadow: 0 4px 12px rgba(0,0,0,0.3);
+  --focus: 0 0 0 3px #a78bfa55;
+}
+
+/* ===============================
+   🌙 Base
+==================================*/
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body { height: 100%; }
+
 body {
-    font-family: Arial, sans-serif;
-    background: #f4f6f9;
-    color: #333;
-    margin: 0;
-    padding: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  margin: 0;
 }
+
+/* ===============================
+   🧭 Header
+==================================*/
 header {
-    background: #0a2540;
-    color: white;
-    text-align: center;
-    padding: 20px 0;
+  background: var(--surface-2);
+  color: #fafafa;
+  text-align: center;
+  padding: 30px 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+
+  /* layout de logo + título si lo usas */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
-main { width: 80%; margin: 30px auto; }
+
+header h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--accent);
+}
+
+header p {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 5px 0 0;
+}
+
+.logo {
+  width: 200px;
+  height: auto;
+  display: block;
+}
+
+/* ===============================
+   🧱 Layout
+==================================*/
+main {
+  width: 100%;
+  max-width: 1000px;
+  margin: 30px auto;
+}
+
 section {
-    background: white;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: var(--space);
+  margin-bottom: 30px;
+  box-shadow: var(--shadow);
 }
-input, textarea {
-    width: 100%;
-    padding: 10px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+
+/* ancho del form dentro de cada sección */
+section form {
+  width: 100%;
+  max-width: 900px;   /* ✅ unidad correcta */
+  margin: 0 auto;
 }
+
+/* ===============================
+   🧾 Formularios
+==================================*/
+.form { display: grid; gap: 16px; }
+
+label {
+  display: block;
+  font-size: 0.9rem;
+  color: #d4d4d8;
+  margin-bottom: 6px;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background-color: #27272a;
+  color: var(--text);
+  font-size: 1rem;
+  transition: border-color .2s, box-shadow .2s, background-color .2s;
+  margin-top: 5px; /* quítalo si usas gap interno en labels */
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='14' viewBox='0 0 24 24' width='14' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px;
+}
+
+option {
+  background-color: #1f1f22;
+  color: var(--text);
+}
+
+/* acciones del form */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* Botones */
 button {
-    margin-top: 15px;
-    background-color: #0078d7;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
+  margin-top: 15px;
+  background-color: var(--btn);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color .3s;
 }
-button:hover { background-color: #005fa3; }
-table { width: 100%; border-collapse: collapse; }
-th, td { padding: 10px; border-bottom: 1px solid #ddd; }
-th { background-color: #0078d7; color: white; }
-.alert { padding: 10px; margin-bottom: 10px; border-radius: 5px; text-align: center; }
-.alert.success { background-color: #c6f6d5; color: #22543d; }
-.alert.error { background-color: #fed7d7; color: #742a2a; }
-.alert.warning { background-color: #fefcbf; color: #744210; }
+button:hover { background-color: var(--btn-hover); }
+button:focus-visible { outline: none; box-shadow: var(--focus); }
+
+/* Botón Guardar (si usas clase específica) */
+.btn-guardar { background-color: #8C4FE8; }
+.btn-guardar:hover { background-color: #8C4FE8; }
+.btn-guardar:focus-visible { box-shadow: 0 0 0 3px rgba(111,194,237,.35); }
+
+/* ===============================
+   🧮 Tabla
+==================================*/
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 12px;
+  border-bottom: 1px solid #27272a;
+}
+
+th {
+  background-color: #27272a;
+  color: #a1a1aa;
+  text-align: left;
+  font-weight: 500;
+}
+
+td { color: var(--text); }
+
+/* Colores de enlaces en la tabla */
+.table-wrap a[href^="tel:"]{
+  color: var(--amber);
+  text-decoration: none;
+}
+.table-wrap a[href^="tel:"]:hover,
+.table-wrap a[href^="tel:"]:focus-visible{
+  color: var(--amber-2);
+  text-decoration: underline;
+}
+
+.table-wrap a[href*="wa.me"]{
+  color: var(--green);
+}
+.table-wrap a[href*="wa.me"]:hover{
+  text-decoration: underline;
+}
+
+.table-wrap a[href^="mailto:"]{
+  color: var(--blue-300);
+  text-decoration: none;
+}
+.table-wrap a[href^="mailto:"]:hover,
+.table-wrap a[href^="mailto:"]:focus-visible{
+  color: var(--blue-200);
+  text-decoration: underline;
+}
+
+/* ===============================
+   ⚠️ Alertas
+==================================*/
+.alert {
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+}
+.alert.success { background-color: #14532d; color: #86efac; }
+.alert.error   { background-color: #450a0a; color: #fca5a5; }
+.alert.warning { background-color: #422006; color: #fcd34d; }
+
+/* ===============================
+   📱 Responsivo
+==================================*/
+@media (max-width: 700px) {
+  main { width: 95%; }
+  th, td { font-size: 0.9rem; }
+  /* ejemplo de form más angosto específico si lo usas */
+  #form-registro {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+}

@@ -1,27 +1,16 @@
 <?php
+// Incluir autenticación compartida
+require_once '/var/www/shared/db.php';
+require_once '/var/www/shared/auth.php';
 
-// Verificación de autenticación
-require_once 'jwt.php';
-$secret = getenv('JWT_SECRET') ?: 'MiSecretoSuperSeguro_ChangeMe_123';
+// Requerir autenticación
+$auth = require_auth('http://localhost:8082/login.php');
 
-if (!isset($_COOKIE['auth_token'])) {
-    header('Location: http://localhost:8082/login.php');
-    exit;
-}
-
-$token = $_COOKIE['auth_token'];
-list($valid, $payload) = jwt_decode($token, $secret);
-
-if (!$valid) {
-    header('Location: http://localhost:8082/login.php');
-    exit;
-}
-
-// Bloque PHP inicial
-include 'db.php';
+// Inicializar variables
 $message = "";
+$mensajes = [];
 
-//Manejo del POST  - Lee/limpia - Valida
+// Manejo del formulario POST
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $nombre      = trim($_POST['nombre'] ?? '');
     $celular     = trim($_POST['celular'] ?? '');
@@ -29,25 +18,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $correo      = trim($_POST['correo'] ?? '');
     $descripcion = trim($_POST['descripcion'] ?? '');
     $estado      = trim($_POST['estado'] ?? '');
-
-    //errores
+    
+    // Validación
     $errores = [];
-    if ($nombre === '') $errores[] = "El nombre es obligatorio.";
+    if (empty($nombre)) $errores[] = "El nombre es obligatorio.";
     if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) $errores[] = "Correo inválido.";
-    if ($categoria === '') $errores[] = "Selecciona la categoría.";
-    if ($estado === '') $errores[] = "Selecciona el estado.";
-    if ($descripcion === '') $errores[] = "La descripción es obligatoria.";
-    if ($celular !== '' && !preg_match('/^(\+?\d{1,3}\s?)?(\d{10}|\d{3}\s?\d{3}\s?\d{4})$/', $celular)) {
-        $errores[] = "Celular inválido.";
+    if (empty($categoria)) $errores[] = "Selecciona la categoría.";
+    if (empty($estado)) $errores[] = "Selecciona el estado.";
+    if (empty($descripcion)) $errores[] = "La descripción es obligatoria.";
+    if (!empty($celular) && !preg_match('/^\d{10}$/', $celular)) {
+        $errores[] = "Celular inválido (10 dígitos).";
     }
-
-   //alerta según éxito o error.
+    
     if (empty($errores)) {
         try {
-            $sql = "INSERT INTO mensajes (nombre, celular, categoria, correo, descripcion, estado)
-                    VALUES (?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO mensajes (usuario_id, nombre, celular, categoria, correo, descripcion, estado)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
-            $stmt->execute([$nombre, $celular, $categoria, $correo, $descripcion, $estado]);
+            $stmt->execute([$auth['id'], $nombre, $celular, $categoria, $correo, $descripcion, $estado]);
             $message = "<div class='alert success'>✅ Registro guardado correctamente.</div>";
         } catch (PDOException $e) {
             $message = "<div class='alert error'>❌ Error al guardar: " . htmlspecialchars($e->getMessage()) . "</div>";
@@ -57,253 +45,256 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Consulta para listar
-//Trae todos los registros ordenados por fecha
+// Consulta para listar (solo mensajes del usuario actual)
 try {
-    $stmt = $conn->query("SELECT * FROM mensajes ORDER BY creado_en DESC");
+    $stmt = $conn->prepare("SELECT id, nombre, celular, categoria, correo, descripcion, estado, creado_en FROM mensajes WHERE usuario_id = ? ORDER BY creado_en DESC");
+    $stmt->execute([$auth['id']]);
     $mensajes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     $mensajes = [];
     $message .= "<div class='alert error'>❌ Error listando registros: " . htmlspecialchars($e->getMessage()) . "</div>";
 }
-
-// Simulación sin base de datos
-// $message = "";
-// $mensajes = [];
-
-// // Si se envía el formulario
-// if ($_SERVER["REQUEST_METHOD"] == "POST") {
-//     $nombre      = trim($_POST['nombre'] ?? '');
-//     $celular     = trim($_POST['celular'] ?? '');
-//     $categoria   = trim($_POST['categoria'] ?? '');
-//     $correo      = trim($_POST['correo'] ?? '');
-//     $descripcion = trim($_POST['descripcion'] ?? '');
-//     $estado      = trim($_POST['estado'] ?? '');
-
-//     $errores = [];
-//     if ($nombre === '') $errores[] = "El nombre es obligatorio.";
-//     if (!filter_var($correo, FILTER_VALIDATE_EMAIL)) $errores[] = "Correo inválido.";
-//     if ($categoria === '') $errores[] = "Selecciona la categoría.";
-//     if ($estado === '') $errores[] = "Selecciona el estado.";
-//     if ($descripcion === '') $errores[] = "La descripción es obligatoria.";
-
-//     if (empty($errores)) {
-//         // Simulamos que se guarda correctamente
-//         $message = "<div class='alert success'>✅ Registro simulado guardado correctamente.</div>";
-//     } else {
-//         $message = "<div class='alert warning'>⚠️ " . htmlspecialchars($errores[0]) . "</div>";
-//     }
-// }
-
-// // Datos simulados (para mostrar la tabla)
-// $mensajes = [
-//     [
-//         'nombre' => 'Ana Pérez',
-//         'celular' => '+57 3001112233',
-//         'categoria' => 'Estudiante',
-//         'correo' => 'ana@example.com',
-//         'descripcion' => 'Consulta sobre talleres.',
-//         'estado' => 'Nuevo',
-//         'creado_en' => '2025-10-08 10:00:00'
-//     ],
-//     [
-//         'nombre' => 'Carlos Gómez',
-//         'celular' => '+57 3125556677',
-//         'categoria' => 'Profesor',
-//         'correo' => 'carlos@example.com',
-//         'descripcion' => 'Solicitud de material.',
-//         'estado' => 'En proceso',
-//         'creado_en' => '2025-10-07 15:30:00'
-//     ]
-// ];
-
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
-<meta charset="UTF-8">
-<title>Campiclouders</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="style.css">
-
-<script>
-// --- Contador de descripción ---
-function actualizarContadorDesc(el) {
-  const count = document.getElementById('desc-count');
-  if (count) count.textContent = el.value.length;
-}
-
-// --- Validación del formulario ---
-function validarFormulario() {
-  const nombre      = document.getElementById('nombre').value.trim();
-  const celular     = document.getElementById('celular').value.trim();
-  const categoria   = document.getElementById('categoria').value;
-  const correo      = document.getElementById('correo').value.trim();
-  const descripcion = document.getElementById('descripcion').value.trim();
-  const estado      = document.getElementById('estado').value;
-
-  const reNombre  = /^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,60}$/;  // solo letras/espacios 2–60
-  const reCorreo  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;       // email básico
-  const reCelular = /^\d{10}$/;                         // 10 dígitos
-
-  const nombreOk  = reNombre.test(nombre);
-  const emailOk   = reCorreo.test(correo);
-  const telOk     = reCelular.test(celular);
-
-  // Límite de descripción (toma del atributo maxlength si existe; si no, 300)
-  const descMax   = document.getElementById('descripcion').maxLength > 0
-                    ? document.getElementById('descripcion').maxLength
-                    : 300;
-
-  let errores = [];
-  if (!nombreOk) errores.push("Nombre obligatorio (solo letras y espacios, 2–60).");
-  if (!emailOk) errores.push("Correo inválido.");
-  if (!categoria) errores.push("Selecciona la categoría.");
-  if (!estado) errores.push("Selecciona el estado.");
-  if (!descripcion) errores.push("La descripción es obligatoria.");
-  if (descripcion.length > descMax) errores.push(`Descripción no debe superar ${descMax} caracteres.`);
-  if (!telOk) errores.push("Celular inválido (exactamente 10 dígitos).");
-
-  if (errores.length) {
-    alert("Revisa el formulario:\n• " + errores.join("\n• "));
-    return false;
-  }
-  return true;
-}
-
-// Inicializa contador al cargar y en cada input
-document.addEventListener('DOMContentLoaded', () => {
-  const desc = document.getElementById('descripcion');
-  if (desc) {
-    actualizarContadorDesc(desc);
-    desc.addEventListener('input', () => actualizarContadorDesc(desc));
-  }
-});
-</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Panel - Campiclouders</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .navbar {
+            background: var(--surface-2);
+            padding: 15px var(--space);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .navbar-brand {
+            font-weight: 600;
+            color: var(--accent);
+        }
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        .navbar-user a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        .navbar-user a:hover {
+            opacity: 0.8;
+        }
+        .btn-logout {
+            background: #ef4444;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+        .btn-logout:hover {
+            background: #dc2626;
+        }
+    </style>
 </head>
 
-<!-- Encabezado -->
 <body>
-  <header>
-    <img src="https://fulppi.s3.us-east-1.amazonaws.com/Logo+de+Campiclouders.png" alt="" class="logo"> 
-    <!-- <h1>Campiclouders</h1>
-    <p>PHP + MySQL</p> -->
-  </header>
+    <!-- Encabezado -->
+    <header>
+        <img src="https://fulppi.s3.us-east-1.amazonaws.com/Logo+de+Campiclouders.png" alt="Campiclouders" class="logo">
+    </header>
 
-  <main>
-    <!-- Mensajes del servidor -->
-    <?php if (!empty($message)) echo $message; ?>
-
-    <!-- Formulario (crear nuevo registro) -->
-    <section>
-      <h2>Nuevo registro</h2>
-      <form method="post" action="" onsubmit="return validarFormulario();" class="form">
-        <div class="grid">
-          <label>Nombre
-            <input id="nombre" name="nombre" type="text" placeholder="Tu nombre"
-                  required
-                  inputmode="text"
-                  pattern="^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]{2,60}$"
-                  maxlength="60"
-                  oninput="this.value=this.value.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]/g,'');">
-          </label>
-
-          <label>Celular
-            <input id="celular" name="celular" type="tel" placeholder="3001234567"
-                  required
-                  inputmode="numeric"
-                  pattern="^\d{10}$"
-                  minlength="10" maxlength="10"
-                  oninput="this.value=this.value.replace(/\D/g,'').slice(0,10);">
-          </label>
-
-          <label>Correo
-            <input id="correo" name="correo" type="email" placeholder="tucorreo@ejemplo.com">
-          </label>
-          
-          <label>Categoría
-            <select id="categoria" name="categoria">
-              <option value="">Selecciona…</option>
-              <option>Profesor</option>
-              <option>Estudiante</option>
-            </select>
-          </label>
-
-          <label>Estado
-            <select id="estado" name="estado">
-              <option value="">Selecciona…</option>
-              <option>Nuevo</option>
-              <option>En proceso</option>
-              <option>Cerrado</option>
-            </select>
-          </label>
+    <!-- Barra de navegación -->
+    <nav class="navbar">
+        <div class="navbar-brand">Panel de Control</div>
+        <div class="navbar-user">
+            <span>👤 <?= htmlspecialchars($auth['usuario']) ?></span>
+            <a href="http://localhost:8082/logout.php" class="btn-logout">Cerrar sesión</a>
         </div>
+    </nav>
 
-        <label>Descripción
-          <textarea id="descripcion" name="descripcion" rows="5"
-                    placeholder="Escribe la descripción…"
-                    required maxlength="300"></textarea>
-        </label>
-        
-        <div class="actions">
-          <button type="submit" class="btn-guardar">Guardar</button>
-        </div>
-      </form>
-    </section>
+    <main>
+        <!-- Mensajes del servidor -->
+        <?php if (!empty($message)) echo $message; ?>
 
-    <!-- Tabla (listar registros) --> 
-    <section>
-      <h2>Registros</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Nombre</th>
-              <th>Celular</th>
-              <th>Categoría</th>
-              <th>Correo</th>
-              <th>Descripción</th>
-              <th>Estado</th>
-              <th>Creado</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php if (count($mensajes) === 0): ?>
-              <tr><td colspan="7" class="muted">Sin registros aún.</td></tr>
-            <?php else: foreach ($mensajes as $r): ?>
-              <tr>
-                <td><?= htmlspecialchars($r['nombre']) ?></td>
-                <td>
-                  <?php if (!empty($r['celular'])): ?>
-                    <div>
-                      <a href="tel:<?= htmlspecialchars($r['celular']) ?>"><?= htmlspecialchars($r['celular']) ?></a>
-                      <?php
-                        $soloDigitos = preg_replace('/\D/','',$r['celular']);
-                        if ($soloDigitos) {
-                          echo ' · <a target="_blank" href="https://wa.me/57'.$soloDigitos.'">WhatsApp</a>';
-                        }
-                      ?>
-                    </div>
-                  <?php else: ?>
-                    <span class="muted">—</span>
-                  <?php endif; ?>
-                </td>
-                <td><?= htmlspecialchars($r['categoria']) ?></td>
-                <td><a href="mailto:<?= htmlspecialchars($r['correo']) ?>"><?= htmlspecialchars($r['correo']) ?></a></td>
-                <td><?= htmlspecialchars($r['descripcion']) ?></td>
-                <td><?= htmlspecialchars($r['estado']) ?></td>
-                <td><?= htmlspecialchars($r['creado_en'] ?? $r['fecha'] ?? '') ?></td>
-              </tr>
-            <?php endforeach; endif; ?>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+        <!-- Formulario (crear nuevo registro) -->
+        <section>
+            <h2>📝 Nuevo Registro</h2>
+            <form method="post" action="" onsubmit="return validarFormulario();" class="form">
+                <div class="grid">
+                    <label>Nombre
+                        <input 
+                            id="nombre" 
+                            name="nombre" 
+                            type="text" 
+                            placeholder="Tu nombre"
+                            required
+                            pattern="^[A-Za-záéíóúäëïöüñÁÉÍÓÚÄËÏÖÜÑ ]{2,100}$"
+                            maxlength="100"
+                        >
+                    </label>
 
-  <footer>
-    © <script>document.write(new Date().getFullYear())</script> · Bootcamp G5
-  </footer>
+                    <label>Celular
+                        <input 
+                            id="celular" 
+                            name="celular" 
+                            type="tel" 
+                            placeholder="3001234567"
+                            inputmode="numeric"
+                            pattern="^\d{10}$"
+                            maxlength="10"
+                        >
+                    </label>
+
+                    <label>Correo
+                        <input 
+                            id="correo" 
+                            name="correo" 
+                            type="email" 
+                            placeholder="tu@email.com"
+                            required
+                        >
+                    </label>
+                    
+                    <label>Categoría
+                        <select id="categoria" name="categoria" required>
+                            <option value="">Selecciona...</option>
+                            <option>Profesor</option>
+                            <option>Estudiante</option>
+                            <option>Otro</option>
+                        </select>
+                    </label>
+
+                    <label>Estado
+                        <select id="estado" name="estado" required>
+                            <option value="">Selecciona...</option>
+                            <option>Nuevo</option>
+                            <option>En proceso</option>
+                            <option>Cerrado</option>
+                        </select>
+                    </label>
+
+                    <label>Prioridad
+                        <select id="prioridad" name="prioridad">
+                            <option value="media">Media</option>
+                            <option value="baja">Baja</option>
+                            <option value="alta">Alta</option>
+                        </select>
+                    </label>
+                </div>
+
+                <label>Descripción
+                    <textarea 
+                        id="descripcion" 
+                        name="descripcion" 
+                        rows="5"
+                        placeholder="Escribe la descripción..."
+                        required 
+                        maxlength="1000"
+                    ></textarea>
+                    <small><span id="desc-count">0</span>/1000</small>
+                </label>
+                
+                <div class="actions">
+                    <button type="submit" class="btn-guardar">💾 Guardar</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Tabla (listar registros) --> 
+        <section>
+            <h2>📋 Mis Registros</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Celular</th>
+                            <th>Categoría</th>
+                            <th>Correo</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                            <th>Creado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (count($mensajes) === 0): ?>
+                            <tr><td colspan="7" style="text-align: center; color: var(--muted);">Sin registros aún.</td></tr>
+                        <?php else: foreach ($mensajes as $r): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($r['nombre']) ?></td>
+                                <td>
+                                    <?php if (!empty($r['celular'])): ?>
+                                        <div>
+                                            <a href="tel:<?= htmlspecialchars($r['celular']) ?>"><?= htmlspecialchars($r['celular']) ?></a>
+                                            <?php
+                                                $soloDigitos = preg_replace('/\D/', '', $r['celular']);
+                                                if ($soloDigitos) {
+                                                    echo ' · <a target="_blank" href="https://wa.me/57' . $soloDigitos . '">WhatsApp</a>';
+                                                }
+                                            ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <span style="color: var(--muted);">—</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?= htmlspecialchars($r['categoria']) ?></td>
+                                <td><a href="mailto:<?= htmlspecialchars($r['correo']) ?>"><?= htmlspecialchars($r['correo']) ?></a></td>
+                                <td><?= htmlspecialchars(substr($r['descripcion'], 0, 50)) ?>...</td>
+                                <td><?= htmlspecialchars($r['estado']) ?></td>
+                                <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($r['creado_en']))) ?></td>
+                            </tr>
+                        <?php endforeach; endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer style="text-align: center; padding: 20px; background: var(--surface-2); margin-top: 40px; color: var(--muted);">
+        © <script>document.write(new Date().getFullYear())</script> · Bootcamp G5 · Campiclouders
+    </footer>
+
+    <script>
+        function actualizarContadorDesc(el) {
+            const count = document.getElementById('desc-count');
+            if (count) count.textContent = el.value.length;
+        }
+
+        function validarFormulario() {
+            const nombre = document.getElementById('nombre').value.trim();
+            const celular = document.getElementById('celular').value.trim();
+            const categoria = document.getElementById('categoria').value;
+            const correo = document.getElementById('correo').value.trim();
+            const descripcion = document.getElementById('descripcion').value.trim();
+            const estado = document.getElementById('estado').value;
+
+            let errores = [];
+            if (!nombre) errores.push("El nombre es obligatorio.");
+            if (!correo) errores.push("El correo es obligatorio.");
+            if (!categoria) errores.push("Selecciona una categoría.");
+            if (!estado) errores.push("Selecciona un estado.");
+            if (!descripcion) errores.push("La descripción es obligatoria.");
+            if (celular && !/^\d{10}$/.test(celular)) errores.push("Celular inválido (10 dígitos).");
+
+            if (errores.length) {
+                alert("Revisa el formulario:\n• " + errores.join("\n• "));
+                return false;
+            }
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const desc = document.getElementById('descripcion');
+            if (desc) {
+                actualizarContadorDesc(desc);
+                desc.addEventListener('input', () => actualizarContadorDesc(desc));
+            }
+        });
+    </script>
 </body>
 </html>

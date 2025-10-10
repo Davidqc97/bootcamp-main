@@ -1,5 +1,7 @@
 <?php
-require_once 'config.php';
-setcookie('auth_token','', time()-3600, '/');
-header("Location: $AUTH_URL/login.php");
+require_once '/var/www/shared/auth.php';
+
+// Redirigir al login
+header('Location: http://localhost:8082/login.php');
 exit;
+?>

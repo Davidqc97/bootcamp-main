@@ -1,69 +1,87 @@
-🧪 QA Report – Docker Web Auth Architecture
+# 🧪 QA Report – Docker Web Auth Architecture
 
-Proyecto: Bootcamp – Taller Docker Web con Autenticación
-Autor QA: José David Escalante
-Fecha: 2025-10-10
-Estado: ✅ Validado con observaciones menores
+**Proyecto:** Bootcamp – Taller Docker Web con Autenticación  
+**Autor QA:** José David Escalante  
+**Fecha:** 2025-10-10  
+**Estado:** ✅ Validado con observaciones menores  
+**Etiquetas:** `qa` `bugfix` `docker` `auth-module`  
 
-🔍 Objetivo
+---
 
-Verificar la correcta modularización del proyecto Docker con servicios separados para:
+## 🎯 Objetivo
 
-Aplicación principal (app)
+Validar la nueva arquitectura modular basada en contenedores Docker, verificando la correcta integración entre los servicios:
 
-Servicio de autenticación (auth)
+- `app` → aplicación principal  
+- `auth` → autenticación de usuarios  
+- `db` → base de datos MySQL  
+- `phpmyadmin` → administración  
 
-Base de datos (db)
+Y confirmar que se resolvieron los errores reportados en la versión anterior:
 
-Administración (phpmyadmin)
+| Error detectado | Estado actual |
+|------------------|----------------|
+| ❌ `../app/db.php` no encontrado | ✅ `shared/db.php` montado correctamente |
+| ❌ Rutas inconsistentes | ✅ Uso de variables en `.env` y URLs absolutas |
+| ❌ Contenedores aislados | ✅ Volúmenes y red compartida |
+| ❌ Redirección incorrecta | ✅ Flujo entre `auth → app` corregido |
 
-y confirmar que se resolvieron los errores de la versión anterior:
+---
 
-❌ ../app/db.php no encontrado
-❌ Rutas inconsistentes
-❌ Contenedores aislados
-❌ Redirección incorrecta
+## 🧩 Hallazgos y Verificación
 
-🧩 Hallazgos y Correcciones Verificadas
-Categoría	Antes (❌)	Ahora (✅)	Resultado
-Conexión BD	include '../app/db.php' → ruta inválida	Se reemplazó por shared/db.php montado como volumen en ambos contenedores	✅ Correcto
-Variables y rutas	URLs relativas y dependientes del contenedor	Se implementaron variables de entorno (BASE_URL_APP, BASE_URL_AUTH) en .env y constantes en config.php	✅ Correcto
-Aislamiento de contenedores	Cada servicio con su propio root sin compartir recursos	Se agregaron volúmenes compartidos (./shared:/var/www/shared) y red común con hostname db	✅ Correcto
-Redirección	header('Location: /login.php') y header('Location: /') incorrectas	Se corrigió a URLs absolutas (http://localhost:8082/login.php, http://localhost:8080/)	✅ Correcto
-JWT Cookie	Token generado sin expiración variable	Ahora usa JWT_EXP_HOURS en .env para definir validez del token	✅ Correcto
-Persistencia de datos	MySQL sin volumen persistente	Volumen db_data creado y montado correctamente	✅ Correcto
-⚙️ Archivos Clave Verificados
+| Categoría | Antes | Después | Resultado |
+|------------|--------|----------|------------|
+| **Conexión a BD** | Rutas relativas `../app/db.php` (fallaba si cambiaba el root) | Se centralizó conexión en `shared/db.php` y se montó como volumen en `app` y `auth` | ✅ |
+| **Variables / Configuración** | Rutas y URLs hardcodeadas | Variables en `.env` (`BASE_URL_APP`, `BASE_URL_AUTH`) y `config.php` | ✅ |
+| **Red entre contenedores** | Servicios aislados | Red compartida por Docker Compose (`hostname: db`) y volúmenes sincronizados | ✅ |
+| **Redirecciones** | `/login.php` o `/` relativos | URLs absolutas (`http://localhost:8080`, `http://localhost:8082`) | ✅ |
+| **JWT** | Sin expiración ni validación robusta | Token firmado con `JWT_SECRET` y expiración controlada por `JWT_EXP_HOURS` | ✅ |
+| **Persistencia** | Datos de MySQL no persistentes | Volumen `db_data` montado correctamente | ✅ |
 
-docker-compose.yml – Estructura modular de servicios y dependencias.
+---
 
-Dockerfile – Instalación limpia con soporte mysqli y pdo_mysql.
+## ⚙️ Archivos revisados
 
-.env – Variables de entorno centralizadas.
+- `docker-compose.yml` → servicios, dependencias y volúmenes  
+- `Dockerfile` → entorno PHP 8.2 con soporte `pdo_mysql`  
+- `.env` → centralización de configuración  
+- `jwt.php`, `login.php`, `register.php`, `logout.php` → flujo JWT  
+- `01_schema.sql` → estructura inicial de BD  
+- `README.md` → documentación de despliegue y pruebas  
 
-jwt.php, login.php, register.php, logout.php – Flujo de autenticación funcional.
+---
 
-01_schema.sql – Base de datos inicial correcta.
+## 🧠 Observaciones y Recomendaciones
 
-README.md – Documentación funcional con instrucciones claras.
+- 🔐 **Seguridad:** mover `JWT_SECRET` fuera del repo público (usar GitHub Secrets o `.env.local`).  
+- ⚙️ **Mantenimiento:** crear un archivo `config.php` en `shared/` para centralizar constantes (`DB_HOST`, `BASE_URL_*`, `JWT_SECRET`).  
+- 🧭 **UX:** mejorar mensajes de éxito/error en `login` y `register`.  
+- 🤖 **CI/CD:** automatizar el `docker-compose up --build` con GitHub Actions para validaciones QA.  
 
-🧠 Observaciones
+---
 
-Mejora futura: centralizar constantes de JWT y base URL en un archivo config.php dentro del volumen shared/.
+## ✅ Conclusión
 
-Seguridad: considerar mover la clave JWT_SECRET fuera del repositorio público (usar .env.local o GitHub Secrets).
+- Todos los errores críticos fueron resueltos.  
+- La arquitectura es modular, reproducible y consistente entre contenedores.  
+- El entorno QA confirma que el sistema funciona correctamente con login, registro y conexión a BD.  
 
-UX: el flujo de login y registro podría mostrar mensajes más claros (éxito, expiración, error de conexión).
+**Estado final:** 🟢 **Aprobado para merge a rama principal (`main` o `release/v2.0`)**
 
-CI/CD: posible mejora automatizando el docker-compose up --build en GitHub Actions para QA automatizado.
+---
 
-🏁 Conclusión
+### 📋 Checklist QA
 
-El refactor modular cumple los objetivos:
+- [x] Contenedores levantan sin errores (`docker-compose up`)  
+- [x] Conexión exitosa a BD (`db` accesible)  
+- [x] Login y registro funcionales  
+- [x] Redirecciones correctas entre módulos  
+- [x] Persistencia en volumen `db_data`  
+- [x] JWT válido y con expiración configurada  
 
-✅ Servicios independientes pero conectados correctamente.
+---
 
-✅ Redirecciones consistentes entre módulos.
-
-✅ Persistencia y seguridad mejoradas.
-
-Estado Final: 🟢 Aprobado para merge en rama principal (main o release/v2.0)
+**Revisado por:**  
+👤 *José David Escalante*  
+🧩 *Administrador de infraestructura & QA técnico*

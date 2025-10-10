@@ -1,5 +1,22 @@
 <?php
 
+// Verificación de autenticación
+require_once 'jwt.php';
+$secret = getenv('JWT_SECRET') ?: 'MiSecretoSuperSeguro_ChangeMe_123';
+
+if (!isset($_COOKIE['auth_token'])) {
+    header('Location: http://localhost:8082/login.php');
+    exit;
+}
+
+$token = $_COOKIE['auth_token'];
+list($valid, $payload) = jwt_decode($token, $secret);
+
+if (!$valid) {
+    header('Location: http://localhost:8082/login.php');
+    exit;
+}
+
 // Bloque PHP inicial
 include 'db.php';
 $message = "";
